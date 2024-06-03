@@ -24,7 +24,6 @@ export const loadUserSession = createAsyncThunk('user/loadUserSession', async ()
 
 export const removeUserSession = createAsyncThunk('user/removeUserSession', async () => {
   const value = await SecureStore.deleteItemAsync(LOCAL_STORAGE_KEYS.user)
-  console.log('User is removed', value)
   return initialState
 })
 

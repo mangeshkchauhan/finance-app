@@ -15,8 +15,6 @@ export default function Login() {
   const [error, setError] = useState('')
 
   const handleLogin = useCallback((email: string, password: string): void => {
-    console.log('email', email)
-    console.log('password', password)
     setError('')
     if (isValidEmail(email)) {
       dispatch(setUser({ email, password }))
