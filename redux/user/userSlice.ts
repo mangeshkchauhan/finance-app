@@ -9,22 +9,19 @@ export const LOCAL_STORAGE_KEYS = {
 export interface UserState {
   email: string
   password: string
+  isLoggedIn: boolean
 }
 
 const initialState: UserState = {
   password: '',
   email: '',
+  isLoggedIn: false,
 }
 
 export const loadUserSession = createAsyncThunk('user/loadUserSession', async () => {
   const value = await SecureStore.getItemAsync(LOCAL_STORAGE_KEYS.user)
   const res = value ? JSON.parse(value)?.user : initialState
   return res
-})
-
-export const removeUserSession = createAsyncThunk('user/removeUserSession', async () => {
-  const value = await SecureStore.deleteItemAsync(LOCAL_STORAGE_KEYS.user)
-  return initialState
 })
 
 export const user = createSlice({
@@ -34,6 +31,7 @@ export const user = createSlice({
     setUser: (state, action: PayloadAction<{ email: string; password: string }>) => {
       state.email = action.payload.email
       state.password = action.payload.password
+      state.isLoggedIn = true
       SecureStore.setItemAsync(LOCAL_STORAGE_KEYS.user, JSON.stringify({ user: state }))
     },
   },

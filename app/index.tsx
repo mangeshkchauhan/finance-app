@@ -7,6 +7,7 @@ import { setUser } from '@/redux/user/userSlice'
 import { useCallback, useState } from 'react'
 import { View, Image, Keyboard, Pressable } from 'react-native'
 import { router } from 'expo-router'
+import { isValidEmail } from '@/utils/utils'
 
 export default function Login() {
   const dispatch = useAppDispatch()
@@ -18,11 +19,14 @@ export default function Login() {
     setError('')
     if (isValidEmail(email)) {
       dispatch(setUser({ email, password }))
-      router.push('/home')
+      setEmail('')
+      setPassword('')
+      router.navigate('/home')
     } else {
       setError('Enter a valid email')
     }
   }, [])
+
   return (
     <BaseView style={{ backgroundColor: '#000' }}>
       <Pressable className="p-4 min-h-screen" onPress={() => Keyboard.dismiss()}>
@@ -38,12 +42,15 @@ export default function Login() {
           <InputField
             containerProps={{ className: 'mb-4' }}
             label="Email"
+            inputMode="email"
             value={email}
             onChangeText={setEmail}
             placeholder="Enter your email"
           />
           <InputField
             containerProps={{ className: 'mb-4' }}
+            keyboardType="default"
+            secureTextEntry
             label="Password"
             value={password}
             onChangeText={setPassword}
@@ -62,10 +69,4 @@ export default function Login() {
       </Pressable>
     </BaseView>
   )
-}
-
-const isValidEmail = (email: string) => {
-  email = email.trim()
-  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  return emailRe.test(email)
 }
