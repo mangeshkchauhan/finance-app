@@ -1,6 +1,6 @@
 import React from 'react'
 import { Text, TextInput, TextInputProps, TextProps, View, ViewProps } from 'react-native'
-import If from '../util/If'
+import If from '../../util/If'
 
 export interface InputFieldProps extends TextInputProps {
   label?: string
@@ -11,7 +11,7 @@ export interface InputFieldProps extends TextInputProps {
   error?: string
 }
 
-const InputField: React.FC<InputFieldProps> = ({
+const DarkInputField: React.FC<InputFieldProps> = ({
   label,
   containerProps,
   labelProps,
@@ -49,4 +49,4 @@ const InputField: React.FC<InputFieldProps> = ({
   )
 }
 
-export default InputField
+export default DarkInputField

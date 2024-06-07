@@ -1,24 +1,28 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import BaseView from '@/components/util/BaseView'
 import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet'
-import { Image, Platform, Pressable, Text, TextInput } from 'react-native'
+import { Platform, Pressable, Text } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { useQuery } from '@tanstack/react-query'
 import Api from '@/api/Api'
 import ListLoader from '@/components/loader/List'
 import If from '@/components/util/If'
-import { GainersTrends } from '@/utils/constants'
 import { FlatList } from 'react-native-gesture-handler'
 import Triangle from '@/components/util/Triangle'
 import StockCard from '@/components/base/StockCard'
+import SearchInputField from '@/components/base/Input/SearchInputField'
+import { debounce } from 'lodash'
+import { AppleSearchData, GainersTrends } from '@/utils/constants'
 
 const Home = () => {
   const bottomSheetRef = useRef<BottomSheet>(null)
   const [showNotch, setShowNotch] = useState(true)
   const [totalPages, setTotalPages] = useState(0)
   const [currentPage, setCurrentPage] = useState(0)
-  const [items, setItems] = useState(GainersTrends.data.trends.slice(0, 5))
+  const [items, setItems] = useState<any[]>([])
+  const [hasSearchData, setHasSearchData] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
   const itemsPerPage = 5
   const index = useSharedValue(0)
   // const { isLoading, data } = useQuery({
@@ -26,6 +30,23 @@ const Home = () => {
   //   queryFn: Api.fetchGainerTrends,
   //   refetchOnMount: true,
   // })
+  // const {
+  //   data: searchData,
+  //   refetch,
+  //   isFetching: isSearchFetching,
+  //   isLoading: isSearchLoading,
+  // } = useQuery({
+  //   queryKey: ['search'],
+  //   queryFn: () => Api.searchStocks(searchTerm),
+  //   refetchOnMount: true,
+  //   initialData: [],
+  //   enabled: searchTerm.length > 1,
+  // })
+  const isSearchLoading = false
+  const isSearchFetching = false
+  const isLoading = false
+  const data = GainersTrends
+  const searchData = AppleSearchData
   const { bottom } = useSafeAreaInsets()
 
   const handleSheetChanges = useCallback((sheetIndex: number) => {
@@ -34,13 +55,15 @@ const Home = () => {
     sheetIndex === 1 && setCurrentPage(0)
   }, [])
 
-  const data = GainersTrends
-
   useEffect(() => {
-    fetchData()
+    if (hasSearchData) {
+      handleSearchData(searchData.data.stock)
+    } else {
+      handleGainersTrends(currentPage)
+    }
   }, [currentPage])
 
-  async function fetchData() {
+  async function handleGainersTrends(currentPage = 0) {
     setTotalPages(data.data.trends.length / 5)
     try {
       const items = data.data.trends.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage)
@@ -50,6 +73,45 @@ const Home = () => {
     }
   }
 
+  async function handleSearchData(data: any[], currentPage = 0) {
+    setTotalPages(data.length / 5)
+    try {
+      const items = data.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage)
+      setItems(items)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const debouncedTriggerSearch = useCallback(
+    debounce((text) => {
+      if (text.length > 0) {
+        setHasSearchData(true)
+        // refetch()
+        //   .then((result) => {
+        //     handleSearchData(result.data.data.stock)
+        //   })
+        //   .catch((error) => {
+        //     console.log(error)
+        //   })
+        handleSearchData(searchData.data.stock)
+      } else {
+        setHasSearchData(false)
+      }
+    }, 1000),
+    [],
+  )
+
+  const handleSearch = (text: string) => {
+    setSearchTerm(text)
+    debouncedTriggerSearch(text)
+    if (text.length > 0) {
+      setHasSearchData(true)
+    } else {
+      handleGainersTrends(0)
+      setHasSearchData(false)
+    }
+  }
   const renderPaginationButtons = () => {
     const maxButtonsToShow = 5
     let startPage = Math.max(0, currentPage - Math.floor(maxButtonsToShow / 2))
@@ -111,7 +173,7 @@ const Home = () => {
     [showNotch],
   )
 
-  const snapPoints = ['70%', '100%']
+  const snapPoints = useMemo(() => ['70%', '100%'], [])
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
@@ -151,9 +213,9 @@ const Home = () => {
         enablePanDownToClose={false}
         enableOverDrag={false}
       >
-        <BottomSheetView>
+        <BottomSheetView style={{}}>
           <Animated.View
-            className={'border items-center justify-center'}
+            className={'items-center justify-center'}
             style={useAnimatedStyle(() => {
               return {
                 marginTop: Platform.OS === 'ios' ? 20 : 0,
@@ -164,7 +226,7 @@ const Home = () => {
               }
             })}
           >
-            <TextInput />
+            <SearchInputField value={searchTerm} onChangeText={(text) => handleSearch(text)} />
           </Animated.View>
 
           <FlatList
@@ -172,12 +234,23 @@ const Home = () => {
             data={items}
             scrollEnabled={true}
             windowSize={5}
+            refreshing={isSearchLoading || isLoading}
             keyExtractor={(item) => item.symbol}
             renderItem={({ item }) => {
-              return <StockCard item={item} />
+              return (
+                <If
+                  condition={!(!isSearchLoading && !isLoading && !isSearchFetching)}
+                  orElse={<StockCard item={item} />}
+                >
+                  <ListLoader />
+                </If>
+              )
             }}
             ListEmptyComponent={
-              <If condition={false} orElse={<Text>There was some error in fetching data</Text>}>
+              <If
+                condition={!(!isSearchLoading && !isLoading && !isSearchFetching)}
+                orElse={<Text>There was some error in fetching data</Text>}
+              >
                 <ListLoader />
               </If>
             }

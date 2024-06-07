@@ -1,5 +1,5 @@
 import Button from '@/components/base/Button'
-import InputField from '@/components/base/InputField'
+import DarkInputField from '@/components/base/Input/DarkInputField'
 import BaseView from '@/components/util/BaseView'
 import { useAppDispatch } from '@/redux/hooks'
 import { setUser } from '@/redux/user/userSlice'
@@ -38,7 +38,7 @@ export default function Login() {
         </View>
         <View>
           <Text className="text-white text-3xl font-semibold mb-6 ">Sign In</Text>
-          <InputField
+          <DarkInputField
             containerProps={{ className: 'mb-4' }}
             label="Email"
             inputMode="email"
@@ -46,7 +46,7 @@ export default function Login() {
             onChangeText={setEmail}
             placeholder="Enter your email"
           />
-          <InputField
+          <DarkInputField
             containerProps={{ className: 'mb-4' }}
             keyboardType="default"
             secureTextEntry

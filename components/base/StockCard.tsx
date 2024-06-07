@@ -23,7 +23,7 @@ const StockCard = ({ item }: Props) => {
           <View className="flex-row items-center">
             <Text className="font-semibold text-2xl mr-3">${item.price}</Text>
             <If
-              condition={item.change_percent > 0}
+              condition={item.change_percent >= 0}
               orElse={
                 <>
                   <Triangle direction="down" />
