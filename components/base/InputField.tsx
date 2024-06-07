@@ -1,7 +1,6 @@
 import React from 'react'
-import { TextInput, TextInputProps, TextProps, View, ViewProps } from 'react-native'
+import { Text, TextInput, TextInputProps, TextProps, View, ViewProps } from 'react-native'
 import If from '../util/If'
-import Texts from '../util/Texts'
 
 export interface InputFieldProps extends TextInputProps {
   label?: string
@@ -28,9 +27,9 @@ const InputField: React.FC<InputFieldProps> = ({
   return (
     <>
       <If condition={!!label}>
-        <Texts.Label className={`mb-2 text-white ${labelClassName}`} {...labelRest}>
+        <Text className={`mb-2 text-xs font-semibold text-white ${labelClassName}`} {...labelRest}>
           {label}
-        </Texts.Label>
+        </Text>
       </If>
 
       <View

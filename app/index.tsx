@@ -1,11 +1,10 @@
 import Button from '@/components/base/Button'
 import InputField from '@/components/base/InputField'
 import BaseView from '@/components/util/BaseView'
-import Texts from '@/components/util/Texts'
 import { useAppDispatch } from '@/redux/hooks'
 import { setUser } from '@/redux/user/userSlice'
 import { useCallback, useState } from 'react'
-import { View, Image, Keyboard, Pressable } from 'react-native'
+import { View, Image, Keyboard, Pressable, Text } from 'react-native'
 import { router } from 'expo-router'
 import { isValidEmail } from '@/utils/utils'
 
@@ -38,7 +37,7 @@ export default function Login() {
           />
         </View>
         <View>
-          <Texts.H1 className="text-white mb-6">Sign In</Texts.H1>
+          <Text className="text-white text-3xl font-semibold mb-6 ">Sign In</Text>
           <InputField
             containerProps={{ className: 'mb-4' }}
             label="Email"
@@ -57,7 +56,7 @@ export default function Login() {
             placeholder="********"
           />
 
-          {error && <Texts.Body className="text-red-300 text-start ml-2">{error}</Texts.Body>}
+          {error && <Text className="text-red-300 text-sm font-semibold text-start ml-2">{error}</Text>}
 
           <Button
             className="mt-4"

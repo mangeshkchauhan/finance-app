@@ -1,6 +1,5 @@
-import { PressableProps, Pressable } from 'react-native'
+import { PressableProps, Pressable, Text } from 'react-native'
 import React from 'react'
-import Texts from '../util/Texts'
 
 type TButton = {
   title: string
@@ -13,9 +12,9 @@ const Button: React.FC<TButton> = ({ title, disabled, className, style, ...props
       style={style}
       {...props}
     >
-      <Texts.BodyLarge className={` ${disabled ? 'text-gray-400' : 'text-white'} font-bold text-center`}>
+      <Text className={` ${disabled ? 'text-gray-400' : 'text-white'} font-bold text-center text-base`}>
         {title}
-      </Texts.BodyLarge>
+      </Text>
     </Pressable>
   )
 }
