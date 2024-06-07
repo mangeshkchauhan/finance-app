@@ -25,7 +25,7 @@ const Stock = () => {
   return (
     <BaseView className="flex-1 flex-col px-6 items-center">
       <If condition={!!showToast}>
-        <View className="absolute top-4 bg-white border px-4 mx-auto py-2 items-center justify-center border-gray-200 rounded-2xl">
+        <View className="absolute z-20 top-4 bg-white border px-4 mx-auto py-2 items-center justify-center border-gray-200 rounded-2xl">
           <Text
             className={`${
               showToast.includes('already') ? 'text-red-500' : 'text-green-700 '
@@ -35,8 +35,8 @@ const Stock = () => {
           </Text>
         </View>
       </If>
-      <ScrollView className="flex-1 flex-col py-10 min-h-screen">
-        <View className="flex-1">
+      <ScrollView scrollEnabled showsVerticalScrollIndicator={false} className="flex-col">
+        <View className="">
           <View className="flex mb-2 min-w-full focus:bg-[#D9D9D9">
             <Image
               className="mr-3 my-4"
@@ -76,7 +76,7 @@ const Stock = () => {
           </Text>
         </View>
         <Button
-          className="mt-16"
+          className="my-16"
           title="Add To Cart"
           onPress={() => {
             if (stocks.find((item) => item.symbol === symbol)) {

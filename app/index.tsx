@@ -7,6 +7,7 @@ import { useCallback, useState } from 'react'
 import { View, Image, Keyboard, Pressable, Text } from 'react-native'
 import { router } from 'expo-router'
 import { isValidEmail } from '@/utils/utils'
+import { ScrollView } from 'react-native-gesture-handler'
 
 export default function Login() {
   const dispatch = useAppDispatch()
@@ -27,45 +28,47 @@ export default function Login() {
   }, [])
 
   return (
-    <BaseView style={{ backgroundColor: '#000' }}>
-      <Pressable className="p-4 min-h-screen" onPress={() => Keyboard.dismiss()}>
-        <View className="items-center">
-          <Image
-            source={require('@/assets/images/logo.png')}
-            style={{ width: 300, height: 300 }}
-            resizeMode="contain"
-          />
-        </View>
-        <View>
-          <Text className="text-white text-3xl font-semibold mb-6 ">Sign In</Text>
-          <DarkInputField
-            containerProps={{ className: 'mb-4' }}
-            label="Email"
-            inputMode="email"
-            value={email}
-            onChangeText={setEmail}
-            placeholder="Enter your email"
-          />
-          <DarkInputField
-            containerProps={{ className: 'mb-4' }}
-            keyboardType="default"
-            secureTextEntry
-            label="Password"
-            value={password}
-            onChangeText={setPassword}
-            placeholder="********"
-          />
+    <BaseView style={{ backgroundColor: '#0A0A0A' }}>
+      <ScrollView keyboardDismissMode="none" keyboardShouldPersistTaps="handled">
+        <Pressable className="p-4 min-h-screen" onPress={() => Keyboard.dismiss()}>
+          <View className="items-center">
+            <Image
+              source={require('@/assets/images/logo.png')}
+              style={{ width: 200, height: 200 }}
+              resizeMode="contain"
+            />
+          </View>
+          <View>
+            <Text className="text-white text-3xl font-semibold mb-6 ">Sign In</Text>
+            <DarkInputField
+              containerProps={{ className: 'mb-4' }}
+              label="Email"
+              inputMode="email"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Enter your email"
+            />
+            <DarkInputField
+              containerProps={{ className: 'mb-4' }}
+              keyboardType="default"
+              secureTextEntry
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="********"
+            />
 
-          {error && <Text className="text-red-300 text-sm font-semibold text-start ml-2">{error}</Text>}
+            {error && <Text className="text-red-300 text-sm font-semibold text-start ml-2">{error}</Text>}
 
-          <Button
-            className="mt-4"
-            disabled={!email || !password}
-            title="Login"
-            onPress={() => handleLogin(email, password)}
-          />
-        </View>
-      </Pressable>
+            <Button
+              className="mt-4"
+              disabled={!email || !password}
+              title="Login"
+              onPress={() => handleLogin(email, password)}
+            />
+          </View>
+        </Pressable>
+      </ScrollView>
     </BaseView>
   )
 }

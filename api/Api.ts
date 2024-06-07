@@ -37,23 +37,12 @@ const searchStocks = async (searchTerm: string) => {
       'X-RapidAPI-Host': X_RapidAPI_Host,
     },
   }
-  console.log({
-    method: 'GET',
-    url: Host_URL + 'search',
-    params: {
-      query: searchTerm,
-    },
-    headers: {
-      'X-RapidAPI-Key': X_RapidAPI_Key,
-      'X-RapidAPI-Host': X_RapidAPI_Host,
-    },
-  })
 
   try {
     const response = await axios.request(options)
     return response.data
   } catch (error) {
-    console.error({error})
+    console.error({ error })
     throw new Error('Failed to fetch data')
   }
 }

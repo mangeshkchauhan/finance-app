@@ -12,20 +12,20 @@ export type StockCardProps = {
   onCardPress?: (item: Stock) => void
 }
 
-const StockCard = ({ item,onCardPress, onDelete }: StockCardProps) => {
+const StockCard = ({ item, onCardPress, onDelete }: StockCardProps) => {
   return (
     <View>
       <View className="flex-row">
         <Pressable
-          onPress={()=> onCardPress && onCardPress(item)}
-          className="h-24 flex-row flex-1 items-center p-4 focus:bg-[#D9D9D9"
+          onPress={() => onCardPress && onCardPress(item)}
+          className="h-20 flex-row flex-1 items-center p-4 focus:bg-[#D9D9D9"
         >
           <Image className="mr-3" style={{ height: 50, width: 50 }} source={require('../../assets/images/trend.png')} />
           <View className="flex-1">
-            <Text className="font-semibold text-2xl">{item.symbol.split(':')[0]}</Text>
+            <Text className="font-semibold text-xl">{item.symbol.split(':')[0]}</Text>
             <Text className="font-medium text-sm text-[#999999]">{item.name}</Text>
             <View className="flex-row items-center">
-              <Text className="font-semibold text-2xl mr-3">${item.price}</Text>
+              <Text className="font-semibold text-xl mr-3">${item.price}</Text>
               <If
                 condition={item.change_percent >= 0}
                 orElse={

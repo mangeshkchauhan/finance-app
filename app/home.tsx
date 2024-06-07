@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import BaseView from '@/components/util/BaseView'
-import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps, BottomSheetView } from '@gorhom/bottom-sheet'
+import BottomSheet, { BottomSheetBackdrop, BottomSheetBackdropProps } from '@gorhom/bottom-sheet'
 import { Platform, Pressable, Text } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
@@ -13,7 +13,7 @@ import Triangle from '@/components/util/Triangle'
 import StockCard from '@/components/base/StockCard'
 import SearchInputField from '@/components/base/Input/SearchInputField'
 import { debounce } from 'lodash'
-import { AppleSearchData, GainersTrends } from '@/utils/constants'
+
 import { router } from 'expo-router'
 
 const Home = () => {
@@ -26,28 +26,27 @@ const Home = () => {
   const [searchTerm, setSearchTerm] = useState('')
   const itemsPerPage = 5
   const index = useSharedValue(0)
-  // const { isLoading, data } = useQuery({
-  //   queryKey: ['todo'],
-  //   queryFn: Api.fetchGainerTrends,
-  //   refetchOnMount: true,
-  // })
-  // const {
-  //   data: searchData,
-  //   refetch,
-  //   isFetching: isSearchFetching,
-  //   isLoading: isSearchLoading,
-  // } = useQuery({
-  //   queryKey: ['search'],
-  //   queryFn: () => Api.searchStocks(searchTerm),
-  //   refetchOnMount: true,
-  //   initialData: [],
-  //   enabled: searchTerm.length > 1,
-  // })
-  const isSearchLoading = false
-  const isSearchFetching = false
-  const isLoading = false
-  const data = GainersTrends
-  const searchData = AppleSearchData
+  const { isLoading, isSuccess, data } = useQuery({
+    queryKey: ['todo'],
+    queryFn: Api.fetchGainerTrends,
+  })
+  const {
+    data: searchData,
+    refetch,
+    isFetching: isSearchFetching,
+    isLoading: isSearchLoading,
+  } = useQuery({
+    queryKey: ['search'],
+    queryFn: () => Api.searchStocks(searchTerm),
+    initialData: [],
+    enabled: searchTerm.length > 1,
+  })
+  // const isSearchLoading = false
+  // const isSearchFetching = false
+  // const isLoading = false
+  // const data = GainersTrends
+  // const searchData = AppleSearchData
+
   const { bottom } = useSafeAreaInsets()
 
   const handleSheetChanges = useCallback((sheetIndex: number) => {
@@ -59,12 +58,13 @@ const Home = () => {
   useEffect(() => {
     if (hasSearchData) {
       handleSearchData(searchData.data.stock)
-    } else {
+    } else if (isSuccess) {
       handleGainersTrends(currentPage)
     }
-  }, [currentPage])
+  }, [currentPage, data])
 
   async function handleGainersTrends(currentPage = 0) {
+    if (isLoading) return
     setTotalPages(data.data.trends.length / 5)
     try {
       const items = data.data.trends.slice(currentPage * itemsPerPage, (currentPage + 1) * itemsPerPage)
@@ -88,14 +88,13 @@ const Home = () => {
     debounce((text) => {
       if (text.length > 0) {
         setHasSearchData(true)
-        // refetch()
-        //   .then((result) => {
-        //     handleSearchData(result.data.data.stock)
-        //   })
-        //   .catch((error) => {
-        //     console.log(error)
-        //   })
-        handleSearchData(searchData.data.stock)
+        refetch()
+          .then((result) => {
+            handleSearchData(result.data.data.stock)
+          })
+          .catch((error) => {
+            console.log(error)
+          })
       } else {
         setHasSearchData(false)
       }
@@ -224,73 +223,69 @@ const Home = () => {
         enableContentPanningGesture={true}
         enableHandlePanningGesture={true}
         enablePanDownToClose={false}
-        enableOverDrag={false}
+        enableOverDrag={true}
       >
-        <BottomSheetView style={{}}>
-          <Animated.View
-            className={'items-center justify-center'}
-            style={useAnimatedStyle(() => {
-              return {
-                marginTop: Platform.OS === 'ios' ? 20 : 0,
-                height: withTiming(index.value === 0 ? 0 : 108),
-                opacity: withTiming(index.value === 0 ? 0 : 1),
-                paddingHorizontal: withTiming(index.value === 0 ? 0 : 16),
-                paddingVertical: withTiming(index.value === 0 ? 0 : 16),
-              }
-            })}
-          >
-            <SearchInputField value={searchTerm} onChangeText={(text) => handleSearch(text)} />
-          </Animated.View>
-
-          <FlatList
-            contentContainerStyle={{ alignItems: 'center', padding: 16 }}
-            data={items}
-            scrollEnabled={true}
-            windowSize={5}
-            refreshing={isSearchLoading || isLoading}
-            keyExtractor={(item) => item.symbol}
-            renderItem={({ item }) => {
-              return (
-                <If
-                  condition={!(!isSearchLoading && !isLoading && !isSearchFetching)}
-                  orElse={
-                    <StockCard
-                      item={item}
-                      onCardPress={() => {
-                        router.push({
-                          pathname: '/stock',
-                          params: item,
-                        })
-                      }}
-                    />
-                  }
-                >
-                  <ListLoader />
-                </If>
-              )
-            }}
-            ListEmptyComponent={
+        <Animated.View
+          className={'items-center justify-center'}
+          style={useAnimatedStyle(() => {
+            return {
+              marginTop: Platform.OS === 'ios' ? 20 : 0,
+              height: withTiming(index.value === 0 ? 0 : 68),
+              opacity: withTiming(index.value === 0 ? 0 : 1),
+              paddingHorizontal: withTiming(index.value === 0 ? 0 : 16),
+              paddingVertical: withTiming(index.value === 0 ? 0 : 16),
+            }
+          })}
+        >
+          <SearchInputField value={searchTerm} onChangeText={(text) => handleSearch(text)} />
+        </Animated.View>
+        <FlatList
+          contentContainerStyle={{ alignItems: 'center', padding: 16 }}
+          data={items}
+          scrollEnabled={true}
+          windowSize={5}
+          showsVerticalScrollIndicator={false}
+          refreshing={isSearchLoading || isLoading}
+          keyExtractor={(item) => item.symbol}
+          renderItem={({ item }) => {
+            return (
               <If
                 condition={!(!isSearchLoading && !isLoading && !isSearchFetching)}
-                orElse={<Text>There was some error in fetching data</Text>}
+                orElse={
+                  <StockCard
+                    item={item}
+                    onCardPress={() => {
+                      router.push({
+                        pathname: '/stock',
+                        params: item,
+                      })
+                    }}
+                  />
+                }
               >
                 <ListLoader />
               </If>
-            }
-          />
-          <Animated.View
-            className={'items-center justify-center flex-row'}
-            style={useAnimatedStyle(() => {
-              return {
-                height: withTiming(index.value === 0 ? 0 : 50),
-                opacity: withTiming(index.value === 0 ? 0 : 1),
-                paddingVertical: withTiming(index.value === 0 ? 0 : 8),
-              }
-            })}
-          >
-            {renderPaginationButtons()}
-          </Animated.View>
-        </BottomSheetView>
+            )
+          }}
+          ListEmptyComponent={
+            <If condition={!(!isSearchLoading && !isLoading && !isSearchFetching)}>
+              <ListLoader />
+            </If>
+          }
+          ListFooterComponent={
+            <Animated.View
+              className={'items-center justify-center flex-row mb-20'}
+              style={useAnimatedStyle(() => {
+                return {
+                  height: withTiming(index.value === 0 ? 0 : 30),
+                  opacity: withTiming(index.value === 0 ? 0 : 1),
+                }
+              })}
+            >
+              {renderPaginationButtons()}
+            </Animated.View>
+          }
+        />
       </BottomSheet>
     </BaseView>
   )
