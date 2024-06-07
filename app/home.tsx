@@ -14,6 +14,7 @@ import StockCard from '@/components/base/StockCard'
 import SearchInputField from '@/components/base/Input/SearchInputField'
 import { debounce } from 'lodash'
 import { AppleSearchData, GainersTrends } from '@/utils/constants'
+import { router } from 'expo-router'
 
 const Home = () => {
   const bottomSheetRef = useRef<BottomSheet>(null)
@@ -123,13 +124,18 @@ const Home = () => {
 
     const buttons = []
 
-    const handlePageClick = (p: number) => setCurrentPage(p)
-
     buttons.push(
       <Pressable
         key={'left'}
         disabled={currentPage === 0}
-        onPress={() => handlePageClick(currentPage - 1)}
+        onPress={() =>
+          setCurrentPage((currentPage) => {
+            if (currentPage === 0) {
+              return currentPage
+            }
+            return currentPage - 1
+          })
+        }
         className="items-center mr-2 justify-center"
       >
         <Triangle direction="left" color={currentPage !== 0 ? 'black' : '#999999'} />
@@ -138,7 +144,7 @@ const Home = () => {
 
     for (let i = startPage; i < endPage; i++) {
       buttons.push(
-        <Pressable key={i} onPress={() => handlePageClick(i)} className="items-center justify-center">
+        <Pressable key={i} onPress={() => setCurrentPage(i)} className="items-center justify-center">
           <Text
             className="font-bold w-6 h-6 text-center text-base mx-1"
             style={{ color: i === currentPage ? 'black' : '#999999' }}
@@ -153,7 +159,14 @@ const Home = () => {
       <Pressable
         key={'right'}
         disabled={currentPage === totalPages - 1}
-        onPress={() => handlePageClick(currentPage + 1)}
+        onPress={() =>
+          setCurrentPage((currentPage) => {
+            if (currentPage === totalPages - 1) {
+              return currentPage
+            }
+            return currentPage + 1
+          })
+        }
         className="items-center justify-center ml-2"
       >
         <Triangle direction="right" color={currentPage !== totalPages - 1 ? 'black' : '#999999'} />
@@ -240,7 +253,17 @@ const Home = () => {
               return (
                 <If
                   condition={!(!isSearchLoading && !isLoading && !isSearchFetching)}
-                  orElse={<StockCard item={item} />}
+                  orElse={
+                    <StockCard
+                      item={item}
+                      onCardPress={() => {
+                        router.push({
+                          pathname: '/stock',
+                          params: item,
+                        })
+                      }}
+                    />
+                  }
                 >
                   <ListLoader />
                 </If>
