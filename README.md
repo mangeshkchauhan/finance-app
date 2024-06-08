@@ -16,6 +16,15 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
     npx expo start
    ```
 
+3. Add the ENV variables
+   ```bash
+    cp .env.example .env
+   ```
+
+
+APK Link [Here](https://drive.google.com/file/d/1dKaDu4mZq_-7Hti0JStTsrBMQ8z6TqOd/view?usp=drive_link)
+
+
 In the output, you'll find options to open the app in a
 
 - [development build](https://docs.expo.dev/develop/development-builds/introduction/)
